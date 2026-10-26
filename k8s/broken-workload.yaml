@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-checkout-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-checkout
+  template:
+    metadata:
+      labels:
+        app: broken-checkout
+    spec:
+      containers:
+        - name: api
+          image: busybox:latest
+          command: ["sh", "-c", "echo Starting service...; sleep 5; exit 137"]
+          resources:
+            limits:
+              memory: "16Mi"

@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: kubevora
+data:
+  ENVIRONMENT: "production"
+  DATABASE_URL: "postgresql+psycopg://kubevora:kubevora_dev_password_2026@postgres.kubevora.svc.cluster.local:5432/kubevora"
+  GEMINI_MODEL: "gemini-1.5-pro"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-secret
+  namespace: kubevora
+type: Opaque
+stringData:
+  GEMINI_API_KEY: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubevora-backend
+  namespace: kubevora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubevora-backend
+  template:
+    metadata:
+      labels:
+        app: kubevora-backend
+    spec:
+      serviceAccountName: kubevora-service-account
+      containers:
+        - name: backend
+          image: kubevora-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health/ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubevora-backend
+  namespace: kubevora
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30080
+  selector:
+    app: kubevora-backend

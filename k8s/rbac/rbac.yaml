@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubevora-service-account
+  namespace: kubevora
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubevora-read-only-role
+rules:
+  # Core resources: inspect pods, read logs, warning events, and endpoints
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "events", "services", "endpoints", "nodes", "namespaces", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  # Workload controllers: inspect deployment & statefulset configurations
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubevora-read-only-binding
+subjects:
+  - kind: ServiceAccount
+    name: kubevora-service-account
+    namespace: kubevora
+roleRef:
+  kind: ClusterRole
+  name: kubevora-read-only-role
+  apiGroup: rbac.authorization.k8s.io

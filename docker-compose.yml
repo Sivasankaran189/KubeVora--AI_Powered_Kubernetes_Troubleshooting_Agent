@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kubevora-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kubevora}
+      POSTGRES_USER: ${POSTGRES_USER:-kubevora}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kubevora_dev_password_2026}
+    ports:
+      - "5432:5432"
+    volumes:
+      - kubevora-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kubevora-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-1.5-pro}
+      - KUBECONFIG_PATH=${KUBECONFIG_PATH:-/home/appuser/.kube/config}
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://kubevora:kubevora_dev_password_2026@postgres:5432/kubevora}
+      - POSTGRES_DB=${POSTGRES_DB:-kubevora}
+      - POSTGRES_USER=${POSTGRES_USER:-kubevora}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-kubevora_dev_password_2026}
+    volumes:
+      - ~/.kube:/home/appuser/.kube:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:8000
+    container_name: kubevora-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  kubevora-postgres-data:
