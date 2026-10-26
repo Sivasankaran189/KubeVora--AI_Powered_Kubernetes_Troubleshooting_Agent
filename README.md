@@ -6,18 +6,6 @@
 
 ---
 
-## 📸 Platform Showcase
-
-| Multi-Cluster Workloads Matrix | Real-Time Investigation Pipeline |
-| :---: | :---: |
-| ![Cluster Workloads Matrix](docs/screenshots/cluster-workloads.png) | ![Investigation Pipeline](docs/screenshots/investigation-pipeline.png) |
-
-| Senior SRE Gemini Diagnosis & Remediation | Secure SRE Console Access |
-| :---: | :---: |
-| ![Senior SRE AI Diagnosis](docs/screenshots/ai-diagnosis-remediation.png) | ![Secure Operations Console](docs/screenshots/operations-auth.png) |
-
----
-
 ## 🏛️ System Architecture
 
 ```text
@@ -229,27 +217,16 @@ All tests mock subprocess calls and HTTPX requests, allowing the suite to run co
 
 ---
 
-## 🛣️ Progress Matrix
 
-- [x] **Prompt 1: Project Setup & Foundation**
-  - FastAPI backend orchestrator & Loguru logging
-  - React 19 (Vite) frontend with Tailwind CSS
-  - Multi-container Docker & Docker Compose setup
-- [x] **Prompt 2: Kubernetes Investigation Engine**
-  - Subprocess `kubectl` executor with RFC 1123 validation
-  - Pod inspector, log tailer with `--previous`, event analyzer, deployment & network inspectors
-  - `POST /investigate` evidence endpoint
-- [x] **Prompt 3: AI Reasoning Engine with Google Gemini**
-  - PromptBuilder with Senior SRE persona and anti-injection defenses
-  - Gemini HTTPX client with exponential backoff on HTTP 429/503
-  - Structured response validation & safe fix preview
-- [x] **Prompt 4: Dashboard, API Integration & PostgreSQL Persistence**
-  - PostgreSQL 16 container with Docker named volume
-  - SQLAlchemy 2.x models (`User`, `Investigation`, `Finding`, `IncidentFingerprint`)
-  - Alembic migrations
-  - Live SSE progress streaming (`POST /investigate/stream`)
-  - User-isolated investigation history (`GET /investigations`, `GET /investigations/{id}`)
-  - React Dashboard with live stepper, safe fix preview, and History view
+## 📸 Platform Showcase
+
+| Multi-Cluster Workloads Matrix | Real-Time Investigation Pipeline |
+| :---: | :---: |
+| ![Cluster Workloads Matrix](docs/screenshots/cluster-workloads.png) | ![Investigation Pipeline](docs/screenshots/investigation-pipeline.png) |
+
+| Senior SRE Gemini Diagnosis & Remediation | Secure SRE Console Access |
+| :---: | :---: |
+| ![Senior SRE AI Diagnosis](docs/screenshots/ai-diagnosis-remediation.png) | ![Secure Operations Console](docs/screenshots/operations-auth.png) |
 
 ---
 
